@@ -17,20 +17,39 @@ package com.example.androiddevchallenge
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.example.androiddevchallenge.ui.theme.MyTheme
 
 class MainActivity : AppCompatActivity() {
+
+    private val vm by viewModels<MainActivityViewModel>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MyTheme {
-                MyApp()
+                MyApp(vm)
             }
         }
     }
@@ -38,24 +57,55 @@ class MainActivity : AppCompatActivity() {
 
 // Start building your app here!
 @Composable
-fun MyApp() {
+fun MyApp(vm: MainActivityViewModel) {
     Surface(color = MaterialTheme.colors.background) {
-        Text(text = "Ready... Set... GO!")
+        Scaffold(
+            topBar = {
+                TopAppBar {
+                    Text(
+                        text = "Final Countdown",
+                        style = MaterialTheme.typography.subtitle1
+                    )
+                }
+            },
+            content = {
+                MainContent(
+                    modifier = Modifier.padding(16.dp),
+                    vm
+                )
+            }
+        )
     }
 }
 
-@Preview("Light Theme", widthDp = 360, heightDp = 640)
 @Composable
-fun LightPreview() {
-    MyTheme {
-        MyApp()
+fun MainContent(modifier: Modifier, vm: MainActivityViewModel) {
+    Column(modifier = modifier
+        .fillMaxWidth()
+    ) {
+
     }
 }
 
-@Preview("Dark Theme", widthDp = 360, heightDp = 640)
 @Composable
-fun DarkPreview() {
-    MyTheme(darkTheme = true) {
-        MyApp()
+fun TimerSetup(vm: MainActivityViewModel) {
+    val textState by remember { mutableStateOf(TextFieldValue()) }
+
+    BasicTextField(
+        value = textState,
+        onValueChange = { textFieldValue: TextFieldValue -> textFieldValue.text }
+    )
+    Button(onClick = { vm.countDown(1) }) {
+        Text(text = "Start Timer")
+    }
+}
+
+@Composable
+fun TimerRunning(vm: MainActivityViewModel) {
+    val remainingTime = vm.remainingTime.observeAsState()
+
+    Text(text = "Time Remaining: $remainingTime")
+    Button(onClick = { vm.stopTimer() }) {
+        Text(text = "Stop Timer")
     }
 }
