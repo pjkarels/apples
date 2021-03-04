@@ -10,20 +10,22 @@ import kotlin.concurrent.timerTask
 
 class MainActivityViewModel : ViewModel() {
 
-    private val _remainingTime = MutableLiveData<Int>()
+    private val timer: Timer = Timer()
+
+    private val _timerRunning = MutableLiveData(false)
+    val timerRunning get() = _timerRunning
+
+    private val _remainingTime = MutableLiveData(0)
     val remainingTime get() = _remainingTime
 
     private val _timeExpired = MutableLiveData(false)
     val timeExpired get() = _timeExpired
 
-    fun setTime(initialRemainingTime: Int) {
+    fun countDown(initialRemainingTime: Int) {
+        _timerRunning.value = true
         _remainingTime.value = initialRemainingTime
-    }
-
-    fun countDown() {
         var localRemainingTime = _remainingTime.value ?: 0
 
-        val timer = Timer()
         timer.scheduleAtFixedRate(
             timerTask {
                 if (localRemainingTime > 0) {
@@ -36,5 +38,10 @@ class MainActivityViewModel : ViewModel() {
             Calendar.getInstance().time,
             1000
         )
+    }
+
+    fun stopTimer() {
+        timer.cancel()
+        _timerRunning.value = false
     }
 }
