@@ -30,9 +30,11 @@ class MainActivityViewModel : ViewModel() {
             timerTask {
                 if (localRemainingTime > 0) {
                     --localRemainingTime
-                    _remainingTime.value = localRemainingTime
-
-                    _timeExpired.value = localRemainingTime <= 0
+                    _remainingTime.postValue(localRemainingTime)
+                    _timeExpired.postValue(localRemainingTime <= 0)
+                } else {
+                    _timerRunning.postValue(false)
+                    _timeExpired.postValue(true)
                 }
             },
             Calendar.getInstance().time,

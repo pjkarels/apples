@@ -19,11 +19,15 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
+import androidx.compose.material.ContentAlpha
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
@@ -35,7 +39,11 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -61,12 +69,14 @@ fun MyApp(vm: MainActivityViewModel) {
     Surface(color = MaterialTheme.colors.background) {
         Scaffold(
             topBar = {
-                TopAppBar {
-                    Text(
-                        text = "Final Countdown",
-                        style = MaterialTheme.typography.subtitle1
-                    )
-                }
+                TopAppBar (
+                    title = {
+                        Text(
+                            text = "Final Countdown",
+                            style = MaterialTheme.typography.subtitle1
+                        )
+                    }
+                )
             },
             content = {
                 MainContent(
@@ -80,32 +90,66 @@ fun MyApp(vm: MainActivityViewModel) {
 
 @Composable
 fun MainContent(modifier: Modifier, vm: MainActivityViewModel) {
+    val isRunning by vm.timerRunning.observeAsState(false)
+    var textState by remember { mutableStateOf(TextFieldValue()) }
+
+    if (isRunning) {
+        TimerRunning(modifier = modifier, vm = vm)
+    } else {
+        TimerSetup(
+            modifier = modifier,
+            vm = vm,
+            textFieldValue = textState
+        ) { textState = it }
+    }
+}
+
+@Composable
+fun TimerSetup(modifier: Modifier,
+               vm: MainActivityViewModel,
+               textFieldValue: TextFieldValue,
+               onTextChanged: (TextFieldValue) -> Unit,
+) {
     Column(modifier = modifier
         .fillMaxWidth()
     ) {
-
+        Box(modifier = modifier.fillMaxWidth()
+        ) {
+            BasicTextField(
+                modifier = modifier.fillMaxWidth()
+                    .align(Alignment.CenterStart),
+                value = textFieldValue,
+                onValueChange = { onTextChanged(it) },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Send
+                ),
+                cursorBrush = SolidColor(LocalContentColor.current),
+                maxLines = 1
+            )
+        }
+        val disableContentColor =
+            MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.disabled)
+        if (textFieldValue.text.isEmpty()) {
+            Text(text = "Enter start time",
+                style = MaterialTheme.typography.body1.copy(color = disableContentColor)
+            )
+        }
+        Button(onClick = { vm.countDown(textFieldValue.text.toInt()) }) {
+            Text(text = "Start Timer")
+        }
     }
 }
 
 @Composable
-fun TimerSetup(vm: MainActivityViewModel) {
-    val textState by remember { mutableStateOf(TextFieldValue()) }
-
-    BasicTextField(
-        value = textState,
-        onValueChange = { textFieldValue: TextFieldValue -> textFieldValue.text }
-    )
-    Button(onClick = { vm.countDown(1) }) {
-        Text(text = "Start Timer")
-    }
-}
-
-@Composable
-fun TimerRunning(vm: MainActivityViewModel) {
-    val remainingTime = vm.remainingTime.observeAsState()
-
-    Text(text = "Time Remaining: $remainingTime")
-    Button(onClick = { vm.stopTimer() }) {
-        Text(text = "Stop Timer")
+fun TimerRunning(modifier: Modifier, vm: MainActivityViewModel) {
+    val remainingTime by vm.remainingTime.observeAsState()
+    Column(modifier = modifier
+        .fillMaxWidth()
+    ) {
+        Text(text = "Time Remaining: $remainingTime")
+        Button(onClick = { vm.stopTimer() }) {
+            Text(text = "Stop Timer")
+        }
     }
 }
