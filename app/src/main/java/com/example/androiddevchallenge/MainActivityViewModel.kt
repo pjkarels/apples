@@ -1,5 +1,6 @@
 package com.example.androiddevchallenge
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
@@ -13,13 +14,13 @@ class MainActivityViewModel : ViewModel() {
     private val timer: Timer = Timer()
 
     private val _timerRunning = MutableLiveData(false)
-    val timerRunning get() = _timerRunning
+    val timerRunning: LiveData<Boolean> get() = _timerRunning
 
     private val _remainingTime = MutableLiveData(0)
-    val remainingTime get() = _remainingTime
+    val remainingTime: LiveData<Int> get() = _remainingTime
 
     private val _timeExpired = MutableLiveData(false)
-    val timeExpired get() = _timeExpired
+    val timeExpired: LiveData<Boolean> get() = _timeExpired
 
     fun countDown(initialRemainingTime: Int) {
         _timerRunning.value = true
