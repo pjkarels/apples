@@ -22,10 +22,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -48,13 +50,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.androiddevchallenge.ui.theme.MyTheme
@@ -100,14 +100,14 @@ fun MyApp(vm: MainActivityViewModel) {
 
 @Composable
 fun MainContent(modifier: Modifier, vm: MainActivityViewModel) {
-    val isRunning by vm.timerRunning.observeAsState(false)
+    val timerState by vm.timerState.observeAsState(false)
     var textState by remember { mutableStateOf(TextFieldValue()) }
     var textFieldFocusState by remember { mutableStateOf(false) }
 
-    if (isRunning) {
-        TimerRunning(modifier = modifier, vm = vm)
-    } else {
-        TimerSetup(
+    when (timerState) {
+        TimerState.Running -> TimerRunning(modifier = modifier, vm = vm)
+        TimerState.Paused -> TimerPaused(modifier = modifier, vm = vm)
+        TimerState.Stopped -> TimerSetup(
             modifier = modifier,
             vm = vm,
             textFieldValue = textState,
@@ -137,12 +137,14 @@ fun TimerSetup(modifier: Modifier,
             if (textFieldValue.text.isEmpty() && !focusState) {
                 Text(text = "Enter start time",
                     style = MaterialTheme.typography.body1.copy(color = disableContentColor),
-                    modifier = Modifier.align(Alignment.CenterStart)
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
                         .padding(16.dp)
                 )
             }
             BasicTextField(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .align(Alignment.CenterStart)
                     .onFocusChanged { state ->
                         if (lastFocusState != state) {
@@ -166,9 +168,11 @@ fun TimerSetup(modifier: Modifier,
         Spacer(
             Modifier.height(16.dp)
         )
-        Button(onClick = { vm.countDown(textFieldValue.text.toInt()) },
-            modifier = Modifier.fillMaxWidth()) {
-            Text(text = "Start Timer")
+        Row(Modifier.fillMaxWidth()) {
+            Button(onClick = { vm.start(textFieldValue.text.toInt()) },
+                modifier = Modifier.fillMaxWidth()) {
+                Text(text = "Start Countdown")
+            }
         }
     }
 }
@@ -180,8 +184,37 @@ fun TimerRunning(modifier: Modifier, vm: MainActivityViewModel) {
         .fillMaxWidth()
     ) {
         Text(text = "Time Remaining: $remainingTime")
-        Button(onClick = { vm.stopTimer() }) {
-            Text(text = "Stop Timer")
+        Row(Modifier.fillMaxWidth()) {
+            Button(modifier = Modifier.fillMaxWidth(0.5F),
+                onClick = { vm.pause() }) {
+                Text(text = "Pause")
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            Button(modifier = Modifier.fillMaxWidth(),
+                onClick = { vm.stop() }) {
+                Text(text = "Stop")
+            }
+        }
+    }
+}
+
+@Composable
+fun TimerPaused(modifier: Modifier, vm: MainActivityViewModel) {
+    val remainingTime by vm.remainingTime.observeAsState()
+    Column(modifier = modifier
+        .fillMaxWidth()
+    ) {
+        Text(text = "Time Remaining: $remainingTime")
+        Row(Modifier.fillMaxWidth()) {
+            Button(modifier = Modifier.fillMaxWidth(0.5F),
+                onClick = { vm.resume() }) {
+                Text(text = "Resume")
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            Button(modifier = Modifier.fillMaxWidth(),
+                onClick = { vm.stop() }) {
+                Text(text = "Stop")
+            }
         }
     }
 }

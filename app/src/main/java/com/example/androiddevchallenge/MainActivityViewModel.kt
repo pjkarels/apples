@@ -11,31 +11,47 @@ import kotlin.concurrent.timerTask
 
 class MainActivityViewModel : ViewModel() {
 
-    private val timer: Timer = Timer()
-
-    private val _timerRunning = MutableLiveData(false)
-    val timerRunning: LiveData<Boolean> get() = _timerRunning
+    private var _timer: Timer? = null
 
     private val _remainingTime = MutableLiveData(0)
     val remainingTime: LiveData<Int> get() = _remainingTime
 
-    private val _timeExpired = MutableLiveData(false)
-    val timeExpired: LiveData<Boolean> get() = _timeExpired
+    private val _timerState = MutableLiveData(TimerState.Stopped)
+    val timerState: LiveData<TimerState> get() = _timerState
 
-    fun countDown(initialRemainingTime: Int) {
-        _timerRunning.value = true
+    fun start(initialRemainingTime: Int) {
+        this.countDownTimer(initialRemainingTime)
+    }
+
+    fun resume() {
+        val remainingTime = _remainingTime.value ?: 0
+        countDownTimer(remainingTime)
+    }
+
+    fun pause() {
+        _timerState.value = TimerState.Paused
+        stopTimer()
+    }
+
+    fun stop() {
+        _timerState.value = TimerState.Stopped
+        stopTimer()
+    }
+
+    private fun countDownTimer(initialRemainingTime: Int) {
+        _timer = Timer()
+        _timerState.value = TimerState.Running
         _remainingTime.value = initialRemainingTime
         var localRemainingTime = _remainingTime.value ?: 0
 
-        timer.scheduleAtFixedRate(
+        _timer?.scheduleAtFixedRate(
             timerTask {
                 if (localRemainingTime > 0) {
                     --localRemainingTime
                     _remainingTime.postValue(localRemainingTime)
-                    _timeExpired.postValue(localRemainingTime <= 0)
                 } else {
-                    _timerRunning.postValue(false)
-                    _timeExpired.postValue(true)
+                    _timer?.cancel()
+                    _timerState.postValue(TimerState.Stopped)
                 }
             },
             Calendar.getInstance().time,
@@ -43,8 +59,12 @@ class MainActivityViewModel : ViewModel() {
         )
     }
 
-    fun stopTimer() {
-        timer.cancel()
-        _timerRunning.value = false
+    private fun stopTimer() {
+        _timer?.cancel()
+        _timer = null
     }
+}
+
+enum class TimerState {
+    Running, Paused, Stopped
 }
