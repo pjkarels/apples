@@ -105,7 +105,8 @@ fun MainContent(modifier: Modifier, vm: MainActivityViewModel) {
             modifier = modifier,
             textFieldValue = textState,
             onTextChanged = { value ->
-                val newText = value.text.replace(Regex("[^\\d]"), "")
+                // strip out non numbers and limit length to 5 digits
+                val newText = value.text.replace(Regex("[^\\d]"), "").take(5)
                 textState = TextFieldValue(
                     text = newText,
                     selection = TextRange(newText.length)
