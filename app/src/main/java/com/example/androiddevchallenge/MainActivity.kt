@@ -103,7 +103,6 @@ fun MainContent(modifier: Modifier, vm: MainActivityViewModel) {
         TimerState.Paused -> TimerPaused(modifier = modifier, vm = vm)
         TimerState.Stopped -> TimerSetup(
             modifier = modifier,
-            vm = vm,
             textFieldValue = textState,
             onTextChanged = { value ->
                 val newText = value.text.replace(Regex("[^\\d]"), "")
@@ -113,18 +112,23 @@ fun MainContent(modifier: Modifier, vm: MainActivityViewModel) {
                 )
             },
             onTextFieldFocused = { textFieldFocusState = it },
-            focusState = textFieldFocusState
+            focusState = textFieldFocusState,
+            onStartClick = {
+                val startTime = textState.text.toInt()
+                textState = TextFieldValue(text = "")
+                vm.start(startTime)
+            }
         )
     }
 }
 
 @Composable
 fun TimerSetup(modifier: Modifier,
-               vm: MainActivityViewModel,
                textFieldValue: TextFieldValue,
                onTextChanged: (TextFieldValue) -> Unit,
                onTextFieldFocused: (Boolean) -> Unit,
-               focusState: Boolean
+               focusState: Boolean,
+               onStartClick: () -> Unit
 ) {
     Column(modifier = modifier
         .fillMaxWidth()
@@ -163,7 +167,7 @@ fun TimerSetup(modifier: Modifier,
             Modifier.height(16.dp)
         )
         Row(Modifier.fillMaxWidth()) {
-            Button(onClick = { vm.start(textFieldValue.text.toInt()) },
+            Button(onClick = { onStartClick() },
                 modifier = Modifier.fillMaxWidth()) {
                 Text(text = stringResource(id = R.string.timer_button_start))
             }
