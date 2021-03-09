@@ -19,8 +19,18 @@ class MainActivityViewModel : ViewModel() {
     private val _timerState = MutableLiveData(TimerState.Stopped)
     val timerState: LiveData<TimerState> get() = _timerState
 
-    fun start(initialRemainingTime: Int) {
-        this.countDownTimer(initialRemainingTime)
+    private val _entryError = MutableLiveData(false)
+    val entryError: LiveData<Boolean> get() = _entryError
+
+    fun start(initialRemainingTime: String) {
+        if (initialRemainingTime.isBlank()) {
+            _entryError.value = true
+            return
+        } else {
+            _entryError.value = false
+        }
+
+        this.countDownTimer(initialRemainingTime.toInt())
     }
 
     fun resume() {

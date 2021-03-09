@@ -46,6 +46,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
@@ -95,6 +96,7 @@ fun MyApp(vm: MainActivityViewModel) {
 @Composable
 fun MainContent(modifier: Modifier, vm: MainActivityViewModel) {
     val timerState by vm.timerState.observeAsState(false)
+    val entryError by vm.entryError.observeAsState(false)
     var textState by remember { mutableStateOf(TextFieldValue()) }
     var textFieldFocusState by remember { mutableStateOf(false) }
 
@@ -115,10 +117,11 @@ fun MainContent(modifier: Modifier, vm: MainActivityViewModel) {
             onTextFieldFocused = { textFieldFocusState = it },
             focusState = textFieldFocusState,
             onStartClick = {
-                val startTime = textState.text.toInt()
+                val startTime = textState.text
                 textState = TextFieldValue(text = "")
                 vm.start(startTime)
-            }
+            },
+            entryError
         )
     }
 }
@@ -129,7 +132,8 @@ fun TimerSetup(modifier: Modifier,
                onTextChanged: (TextFieldValue) -> Unit,
                onTextFieldFocused: (Boolean) -> Unit,
                focusState: Boolean,
-               onStartClick: () -> Unit
+               onStartClick: () -> Unit,
+               hasEntryError: Boolean
 ) {
     Column(modifier = modifier
         .fillMaxWidth()
@@ -164,6 +168,9 @@ fun TimerSetup(modifier: Modifier,
             textStyle = LocalTextStyle.current.copy(color = LocalContentColor.current),
             maxLines = 1,
         )
+        if (hasEntryError) {
+            Text(text = stringResource(id = R.string.timer_setup_error_entry_empty), color = Color.Red)
+        }
         Spacer(
             Modifier.height(16.dp)
         )
@@ -183,6 +190,7 @@ fun TimerRunning(modifier: Modifier, vm: MainActivityViewModel) {
         .fillMaxWidth()
     ) {
         Text(text = stringResource(id = R.string.timer_label_remaining_time, "$remainingTime"))
+        Spacer(modifier = Modifier.height(16.dp))
         Row(Modifier.fillMaxWidth()) {
             Button(modifier = Modifier.fillMaxWidth(0.5F),
                 onClick = { vm.pause() }) {

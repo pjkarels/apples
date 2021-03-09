@@ -19,4 +19,5 @@
 
     <string name="timer_setup_label_startTime">Start Time</string>
     <string name="timer_setup_label_entry_startTime">Enter start time</string>
+    <string name="timer_setup_error_entry_empty">Please enter a value.</string>
 </resources>
