@@ -19,7 +19,6 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -47,14 +46,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.example.androiddevchallenge.ui.theme.MyTheme
-import java.util.regex.Pattern
 
 class MainActivity : AppCompatActivity() {
 
@@ -78,7 +76,7 @@ fun MyApp(vm: MainActivityViewModel) {
                 TopAppBar (
                     title = {
                         Text(
-                            text = "The Final Countdown",
+                            text = stringResource(id = R.string.app_name),
                             style = MaterialTheme.typography.subtitle1
                         )
                     }
@@ -150,10 +148,10 @@ fun TimerSetup(modifier: Modifier,
                 imeAction = ImeAction.Send
             ),
             label = {
-                Text(text = "Start Time")
+                Text(text = stringResource(id = R.string.timer_setup_label_startTime))
             },
             placeholder = {
-                Text(text = "Enter start time",
+                Text(text = stringResource(id = R.string.timer_setup_label_entry_startTime),
                 style = MaterialTheme.typography.body1.copy(color = disableContentColor),
                 modifier = Modifier
                 )
@@ -167,7 +165,7 @@ fun TimerSetup(modifier: Modifier,
         Row(Modifier.fillMaxWidth()) {
             Button(onClick = { vm.start(textFieldValue.text.toInt()) },
                 modifier = Modifier.fillMaxWidth()) {
-                Text(text = "Start Countdown")
+                Text(text = stringResource(id = R.string.timer_button_start))
             }
         }
     }
@@ -179,16 +177,16 @@ fun TimerRunning(modifier: Modifier, vm: MainActivityViewModel) {
     Column(modifier = modifier
         .fillMaxWidth()
     ) {
-        Text(text = "Time Remaining: $remainingTime")
+        Text(text = stringResource(id = R.string.timer_label_remaining_time, "$remainingTime"))
         Row(Modifier.fillMaxWidth()) {
             Button(modifier = Modifier.fillMaxWidth(0.5F),
                 onClick = { vm.pause() }) {
-                Text(text = "Pause")
+                Text(text = stringResource(id = R.string.timer_button_pause))
             }
             Spacer(modifier = Modifier.width(8.dp))
             Button(modifier = Modifier.fillMaxWidth(),
                 onClick = { vm.stop() }) {
-                Text(text = "Stop")
+                Text(text = stringResource(id = R.string.timer_button_stop))
             }
         }
     }
@@ -200,16 +198,16 @@ fun TimerPaused(modifier: Modifier, vm: MainActivityViewModel) {
     Column(modifier = modifier
         .fillMaxWidth()
     ) {
-        Text(text = "Time Remaining: $remainingTime")
+        Text(text = stringResource(id = R.string.timer_label_remaining_time, "$remainingTime"))
         Row(Modifier.fillMaxWidth()) {
             Button(modifier = Modifier.fillMaxWidth(0.5F),
                 onClick = { vm.resume() }) {
-                Text(text = "Resume")
+                Text(text = stringResource(id = R.string.timer_button_resume))
             }
             Spacer(modifier = Modifier.width(8.dp))
             Button(modifier = Modifier.fillMaxWidth(),
                 onClick = { vm.stop() }) {
-                Text(text = "Stop")
+                Text(text = stringResource(id = R.string.timer_button_stop))
             }
         }
     }
