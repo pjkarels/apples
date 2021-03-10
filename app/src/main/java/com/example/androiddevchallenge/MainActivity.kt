@@ -74,7 +74,7 @@ fun MyApp(vm: MainActivityViewModel) {
     Surface(color = MaterialTheme.colors.background) {
         Scaffold(
             topBar = {
-                TopAppBar (
+                TopAppBar(
                     title = {
                         Text(
                             text = stringResource(id = R.string.app_name),
@@ -127,16 +127,18 @@ fun MainContent(modifier: Modifier, vm: MainActivityViewModel) {
 }
 
 @Composable
-fun TimerSetup(modifier: Modifier,
-               textFieldValue: TextFieldValue,
-               onTextChanged: (TextFieldValue) -> Unit,
-               onTextFieldFocused: (Boolean) -> Unit,
-               focusState: Boolean,
-               onStartClick: () -> Unit,
-               hasEntryError: Boolean
+fun TimerSetup(
+    modifier: Modifier,
+    textFieldValue: TextFieldValue,
+    onTextChanged: (TextFieldValue) -> Unit,
+    onTextFieldFocused: (Boolean) -> Unit,
+    focusState: Boolean,
+    onStartClick: () -> Unit,
+    hasEntryError: Boolean
 ) {
-    Column(modifier = modifier
-        .fillMaxWidth()
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
     ) {
         var lastFocusState by remember { mutableStateOf(FocusState.Inactive) }
         val disableContentColor =
@@ -160,9 +162,10 @@ fun TimerSetup(modifier: Modifier,
                 Text(text = stringResource(id = R.string.timer_setup_label_startTime))
             },
             placeholder = {
-                Text(text = stringResource(id = R.string.timer_setup_label_entry_startTime),
-                style = MaterialTheme.typography.body1.copy(color = disableContentColor),
-                modifier = Modifier
+                Text(
+                    text = stringResource(id = R.string.timer_setup_label_entry_startTime),
+                    style = MaterialTheme.typography.body1.copy(color = disableContentColor),
+                    modifier = Modifier
                 )
             },
             textStyle = LocalTextStyle.current.copy(color = LocalContentColor.current),
@@ -175,8 +178,10 @@ fun TimerSetup(modifier: Modifier,
             Modifier.height(16.dp)
         )
         Row(Modifier.fillMaxWidth()) {
-            Button(onClick = { onStartClick() },
-                modifier = Modifier.fillMaxWidth()) {
+            Button(
+                onClick = { onStartClick() },
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 Text(text = stringResource(id = R.string.timer_button_start))
             }
         }
@@ -186,19 +191,24 @@ fun TimerSetup(modifier: Modifier,
 @Composable
 fun TimerRunning(modifier: Modifier, vm: MainActivityViewModel) {
     val remainingTime by vm.remainingTime.observeAsState()
-    Column(modifier = modifier
-        .fillMaxWidth()
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
     ) {
         Text(text = stringResource(id = R.string.timer_label_remaining_time, "$remainingTime"))
         Spacer(modifier = Modifier.height(16.dp))
         Row(Modifier.fillMaxWidth()) {
-            Button(modifier = Modifier.fillMaxWidth(0.5F),
-                onClick = { vm.pause() }) {
+            Button(
+                modifier = Modifier.fillMaxWidth(0.5F),
+                onClick = { vm.pause() }
+            ) {
                 Text(text = stringResource(id = R.string.timer_button_pause))
             }
             Spacer(modifier = Modifier.width(8.dp))
-            Button(modifier = Modifier.fillMaxWidth(),
-                onClick = { vm.stop() }) {
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { vm.stop() }
+            ) {
                 Text(text = stringResource(id = R.string.timer_button_stop))
             }
         }
@@ -208,18 +218,23 @@ fun TimerRunning(modifier: Modifier, vm: MainActivityViewModel) {
 @Composable
 fun TimerPaused(modifier: Modifier, vm: MainActivityViewModel) {
     val remainingTime by vm.remainingTime.observeAsState()
-    Column(modifier = modifier
-        .fillMaxWidth()
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
     ) {
         Text(text = stringResource(id = R.string.timer_label_remaining_time, "$remainingTime"))
         Row(Modifier.fillMaxWidth()) {
-            Button(modifier = Modifier.fillMaxWidth(0.5F),
-                onClick = { vm.resume() }) {
+            Button(
+                modifier = Modifier.fillMaxWidth(0.5F),
+                onClick = { vm.resume() }
+            ) {
                 Text(text = stringResource(id = R.string.timer_button_resume))
             }
             Spacer(modifier = Modifier.width(8.dp))
-            Button(modifier = Modifier.fillMaxWidth(),
-                onClick = { vm.stop() }) {
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { vm.stop() }
+            ) {
                 Text(text = stringResource(id = R.string.timer_button_stop))
             }
         }
